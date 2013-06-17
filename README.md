@@ -1,4 +1,6 @@
-poe_math
+POE Math
 ========
 
-some math behind game Path Of Exile
+Plots demonstating some mechanics in game [Path Of Exile](http://www.pathofexile.com/).
+
+Online version available here http://poemath.rsklab.com.
