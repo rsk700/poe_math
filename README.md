@@ -1,6 +1,6 @@
 POE Math
 ========
 
-Plots demonstating some mechanics in game [Path Of Exile](http://www.pathofexile.com/).
+Plots demonstating some mechanics of game [Path Of Exile](http://www.pathofexile.com/).
 
-Online version available here http://poemath.rsklab.com.
+Online version available here http://rsk700.github.io/poe_math/
