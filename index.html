@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>POE Math</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css" rel="stylesheet">
+		<link href="http://cdnjs.cloudflare.com/ajax/libs/qunit/1.11.0/qunit.min.css" rel="stylesheet">
+		<style>
+			.plot {
+				width: 400px;
+				height: 400px;
+				display: inline-block;
+			}
+
+			.affix {
+				top: 10px;
+			}
+
+			.nav-list {
+				max-width: 130px;
+			}
+		</style>
+		<script type="text/javascript">
+			if (typeof addthis_config !== "undefined") {
+				addthis_config.services_exclude = 'print'
+			} else {
+				var addthis_config = {
+					services_exclude: 'print'
+				};
+			}
+		</script>
+		<script type="text/javascript">
+			var _gaq = _gaq || [];
+			_gaq.push(['_setAccount', 'UA-41056711-2']);
+			_gaq.push(['_trackPageview']);
+			(function() {
+				var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+				ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+				var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+			})();
+		</script>
+	</head>
+	<body data-spy="scroll" onload="$(document).ready(initialize)">
+		<div class="container-fluid">
+			<div class="row-fluid">
+				<div class="span12">
+					<div class="page-header"><h1>POE Math <small>some math behind game <a href="http://www.pathofexile.com/" target="_blank">Path Of Exile</a></small></h1></div>
+				</div>
+			</div>
+			<div class="row-fluid">
+				<div class="span2">
+					<ul class="nav nav-list" data-spy="affix" data-offset-top="100">
+						<li><a href="#bd">Block Duration</a></li>
+						<li><a href="#caa">Chance To Avoid Attack</a></li>
+						<li><a href="#cth">Chance To Hit</a></li>
+						<li><a href="#dr">Damage Reduction</a></li>
+						<li><a href="#sad">Status Ailment Duration</a></li>
+						<li><a href="#sc">Stun Chance</a></li>
+						<li style="margin-top: 20px">
+						<!-- AddThis Button BEGIN -->
+						<div class="addthis_toolbox addthis_default_style ">
+							<a class="addthis_button_preferred_1"></a>
+							<a class="addthis_button_preferred_2"></a>
+							<a class="addthis_button_preferred_3"></a>
+							<a class="addthis_button_compact"></a>
+							<a class="addthis_counter addthis_bubble_style"></a>
+						</div>
+						<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-51bec34c09dad920"></script>
+						<!-- AddThis Button END -->
+						</li>
+					</ul>
+				</div>
+				<div class="span10">
+					<section id="test" style="display: none">
+						<h1>QUnit Tests</h1>
+						<div id="qunit"></div>
+					</section>
+					<section id="bd">
+						<h1>Block Duration <small><a href="http://en.pathofexilewiki.com/wiki/Block" target="_blank">description</a></small></h1>
+						<p>
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="bd_br">Block and Stun Recovery, Block Recovery</label>
+								<div class="controls">
+									<label>
+										<input type="text" id="bd_br" value="100" onblur="update_value(bd_fun, bd_graph); bd_update_plot()">
+										%
+									</label>
+								</div>
+							</div>
+							<hr>
+							<div class="control-group">
+								<label class="control-label" for="bd_bd">Block Duration</label>
+								<div class="controls">
+									<label>
+										<input type="text" id="bd_bd" value="0" onblur="update_value(bd_fun, bd_graph.n); bd_update_plot()">
+										ms
+									</label>
+								</div>
+							</div>
+						</form>
+						</p>
+						<p>
+						<div id="bd_plot" class="plot"></div>
+						</p>
+					</section>
+					<section id="caa">
+						<h1>Chance To Avoid Attack <small><a href="http://en.pathofexilewiki.com/wiki/Evasion" target="_blank">description</a></small></h1>
+						<p>Chance To Evade is <i>1 - ChanceToHit</i>, and <i>ChanceToEvade=ChanceToAvoidAttack</i> if <i>ChanceToDodge=0</i></p>
+						<p>
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="caa_aa">Attacker's Accuracy</label>
+								<div class="controls">
+									<input type="text" id="caa_aa" value="100" onblur="update_value(caa_fun, caa_graph); caa_update_plots()">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="caa_de">Defender's Evasion</label>
+								<div class="controls">
+									<input type="text" id="caa_de" value="300" onblur="update_value(caa_fun, caa_graph.n.n); caa_update_plots()">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="caa_ctd">Chance To Dodge</label>
+								<div class="controls">
+									<input type="text" id="caa_ctd" value="0.2" onblur="update_value(caa_fun, caa_ctd_graph); caa_update_plots()">
+								</div>
+							</div>
+							<hr>
+							<div class="control-group">
+								<label class="control-label" for="caa_caa">Chance To Avoid Attack</label>
+								<div class="controls">
+									<input type="text" id="caa_caa" value="0" onblur="update_value(caa_fun, caa_graph.n); caa_update_plots()">
+								</div>
+							</div>
+						</form>
+						</p>
+						<p>
+						<div id="caa_plot_1" class="plot"></div>
+						<div id="caa_plot_2" class="plot"></div>
+						<div id="caa_plot_3" class="plot"></div>
+						</p>
+					</section>
+					<section id="cth">
+						<h1>Chance To Hit <small><a href="http://en.pathofexilewiki.com/wiki/Accuracy" target="_blank">description</a></small></h1>
+						<p>
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="cth_aa">Attacker's Accuracy</label>
+								<div class="controls">
+									<input type="text" id="cth_aa" value="100" onblur="update_value(cth_fun, cth_graph.n.n); cth_update_plots()">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="cth_de">Defender's Evasion</label>
+								<div class="controls">
+									<input type="text" id="cth_de" value="300" onblur="update_value(cth_fun, cth_graph); cth_update_plots()">
+								</div>
+							</div>
+							<hr>
+							<div class="control-group">
+								<label class="control-label" for="cth_cth">Chance To Hit</label>
+								<div class="controls">
+									<input type="text" id="cth_cth" value="0" onblur="update_value(cth_fun, cth_graph.n); cth_update_plots()">
+								</div>
+							</div>
+						</form>
+						</p>
+						<p>
+						<div id="cth_plot_1" class="plot"></div>
+						<div id="cth_plot_2" class="plot"></div>
+						<div id="cth_plot_3" class="plot"></div>
+						</p>
+					</section>
+					<section id="dr">
+						<h1>Damage Reduction <small><a href="http://en.pathofexilewiki.com/wiki/Armour" target="_blank">description</a></small></h1>
+						<p>
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="dr_a">Armour</label>
+								<div class="controls">
+									<input type="text" id="dr_a" value="1200" onblur="update_value(dr_fun, dr_graph.n.n); dr_update_plots()">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="dr_d">Damage</label>
+								<div class="controls">
+									<input type="text" id="dr_d" value="200" onblur="update_value(dr_fun, dr_graph); dr_update_plots()">
+								</div>
+							</div>
+							<hr>
+							<div class="control-group">
+								<label class="control-label" for="dr_dr">Damage Reduction</label>
+								<div class="controls">
+									<label>
+										<input type="text" id="dr_dr" value="0" onblur="update_value(dr_fun, dr_graph.n); dr_update_plots()">
+										%
+									</label>
+								</div>
+							</div>
+						</form>
+						</p>
+						<p>
+						<div id="dr_plot_1" class="plot"></div>
+						<div id="dr_plot_2" class="plot"></div>
+						<div id="dr_plot_3" class="plot"></div>
+						</p>
+					</section>
+					<section id="sad">
+						<h1>Status Ailment Duration <small><a href="http://en.pathofexilewiki.com/wiki/Chill" target="_blank">chill</a>, <a href="http://en.pathofexilewiki.com/wiki/Freeze" target="_blank">freeze</a>, <a href="http://en.pathofexilewiki.com/wiki/Shock" target="_blank">shock</a></small></h1>
+						<p>
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="sad_type">Status Ailment Type</label>
+								<div class="controls">
+									<label class="radio">
+										<input type="radio" name="sad_option" id="sad_chill" value="138" onchange="$('#sad_d').val(this.value); update_value(sad_fun, sad_duration_graph); sad_update_plots()" checked>
+										Chill
+									</label>
+									<label class="radio">
+										<input type="radio" name="sad_option" id="sad_freeze" value="100" onchange="$('#sad_d').val(this.value); update_value(sad_fun, sad_duration_graph); sad_update_plots()">
+										Freeze
+									</label>
+									<label class="radio">
+										<input type="radio" name="sad_option" id="sad_shock" value="276" onchange="$('#sad_d').val(this.value); update_value(sad_fun, sad_duration_graph); sad_update_plots()">
+										Shock
+									</label>
+								</div>
+							</div>
+							<div class="control-group" style="display: none">
+								<label class="control-label" for="sad_d">Duration</label>
+								<div class="controls">
+									<input type="text" id="sad_d" value="138">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="sad_cd">Elemental Damage</label>
+								<div class="controls">
+									<input type="text" id="sad_ed" value="100" onblur="update_value(sad_fun, sad_graph.n.n); sad_update_plots()">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="sad_tml">Target's Maximum Life</label>
+								<div class="controls">
+									<input type="text" id="sad_tml" value="3000" onblur="update_value(sad_fun, sad_graph); sad_update_plots()">
+								</div>
+							</div>
+							<hr>
+							<div class="control-group">
+								<label class="control-label" for="sad_sad">Status Ailment Duration</label>
+								<div class="controls">
+									<label>
+										<input type="text" id="sad_sad" value="0" onblur="update_value(sad_fun, sad_graph.n); sad_update_plots()">
+										ms
+									</label>
+								</div>
+							</div>
+						</form>
+						</p>
+						<p>
+						<div id="sad_plot_1" class="plot"></div>
+						<div id="sad_plot_2" class="plot"></div>
+						<div id="sad_plot_3" class="plot"></div>
+						</p>
+					</section>
+					<section id="sc">
+						<h1>Stun Chance <small><a href="http://en.pathofexilewiki.com/wiki/Stun" target="_blank">description</a></small></h1>
+						<p>
+						<form class="form-horizontal">
+							<div class="control-group">
+								<label class="control-label" for="sc_deml">Defender Effective Maximum Life</label>
+								<div class="controls">
+									<input type="text" id="sc_deml" value="1000" onblur="update_value(sc_fun, sc_graph.n.n); sc_update_plots()">
+								</div>
+							</div>
+							<div class="control-group">
+								<label class="control-label" for="sc_d">Damage</label>
+								<div class="controls">
+									<input type="text" id="sc_d" value="200" onblur="update_value(sc_fun, sc_graph); sc_update_plots()">
+								</div>
+							</div>
+							<div class="control-group">
+								<div class="controls">
+									<label class="checkbox">
+										<input type="checkbox" id="sc_es" onchange="if(this.checked){$('#sc_sces').val(0.5)}else{$('#sc_sces').val(1)}; update_value(sc_fun, sc_es_graph); sc_update_plots()"> Defender has greater than 0 Energy Shield
+									</label>
+								</div>
+							</div>
+							<div class="control-group" style="display: none">
+								<label class="control-label" for="sc_sces">Stun Chance Through Energy Shield</label>
+								<div class="controls">
+									<input type="text" id="sc_sces" value="1">
+								</div>
+							</div>
+							<hr>
+							<div class="control-group">
+								<label class="control-label" for="sc_sc">Stun Chance</label>
+								<div class="controls">
+									<input type="text" id="sc_sc" value="0" onblur="update_value(sc_fun, sc_graph.n); sc_update_plots()">
+								</div>
+							</div>
+						</form>
+						</p>
+						<p>
+						<div id="sc_plot_1" class="plot"></div>
+						<div id="sc_plot_2" class="plot"></div>
+						<div id="sc_plot_3" class="plot"></div>
+						</p>
+					</section>
+					<p class="text-center">
+					<small>This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.</small>
+					</p>
+				</div>
+			</div>
+		</div>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8/jquery.flot.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8/jquery.flot.crosshair.min.js"></script>
+		<script src="http://cdnjs.cloudflare.com/ajax/libs/qunit/1.11.0/qunit.min.js"></script>
+		<script src="js/jquery.flot.axislabels.js"></script>
+		<script src="js/poemath.js"></script>
+	</body>
+</html>
