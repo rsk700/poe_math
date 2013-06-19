@@ -15,6 +15,8 @@ Adding new plot
 
 */
 
+var previousPoint = null;
+
 function Fun(f){
 	this.f = f; 					// functions for variables
 	this.v = new Array(f.length);	// values of variables
@@ -90,6 +92,9 @@ function get_plot_options(legend_position, xlabel, ylabel){
 		crosshair: {
 			mode: 'xy'
 		},
+		grid: {
+			hoverable: true
+		},
 		legend: {
 			position: legend_position
 		},
@@ -100,6 +105,34 @@ function get_plot_options(legend_position, xlabel, ylabel){
 			axisLabel: ylabel
 		}]
 	};
+}
+
+function plot_show_tooltip(x, y, plotx, ploty){
+	$('<div id="plottooltip">' + plotx + ', ' + ploty + '</div>').css({
+		position: 'absolute',
+		display: 'none',
+		top: y + 10,
+		left: x + 20,
+		border: 'none',
+		'background-color': '#eee',
+		opacity: 0.70
+	}).appendTo('body').fadeIn(200);
+}
+
+function plot_tooltip(event, pos, item) {
+	if(item){
+		if(previousPoint != item.dataIndex){
+			previousPoint = item.dataIndex;
+			$('#plottooltip').remove();
+			var x = Math.round(item.datapoint[0] * 100) / 100,
+				y = Math.round(item.datapoint[1] * 100) / 100;
+			plot_show_tooltip(item.pageX, item.pageY, x, y);
+		}
+	}
+	else {
+		$('#plottooltip').remove();
+		previousPoint = null;
+	}
 }
 
 // Chance To Hit Section
@@ -520,6 +553,9 @@ function initialize() {
 	cth_fun.v[1] = parseInt($('#cth_de').val());
 	update_value(cth_fun, cth_graph.n.n) // aa
 	cth_update_plots();
+	$('#cth_plot_1').bind('plothover', plot_tooltip);
+	$('#cth_plot_2').bind('plothover', plot_tooltip);
+	$('#cth_plot_3').bind('plothover', plot_tooltip);
 
 	// CAA init
 	caa_fun.v[0] = parseInt($('#caa_aa').val());
@@ -527,11 +563,15 @@ function initialize() {
 	caa_fun.v[2] = parseFloat($('#caa_ctd').val());
 	update_value(caa_fun, caa_graph.n.n); // de
 	caa_update_plots();
+	$('#caa_plot_1').bind('plothover', plot_tooltip);
+	$('#caa_plot_2').bind('plothover', plot_tooltip);
+	$('#caa_plot_3').bind('plothover', plot_tooltip);
 
 	// BD init
 	bd_fun.v[0] = parseInt($('#bd_br').val());
 	update_value(bd_fun, bd_graph); // br
 	bd_update_plot();
+	$('#bd_plot').bind('plothover', plot_tooltip);
 
 	// SAD init
 	sad_fun.v[0] = parseInt($('#sad_ed').val());
@@ -539,12 +579,18 @@ function initialize() {
 	sad_fun.v[2] = parseInt($('#sad_d').val());
 	update_value(sad_fun, sad_graph.n.n); // ed
 	sad_update_plots();
+	$('#sad_plot_1').bind('plothover', plot_tooltip);
+	$('#sad_plot_2').bind('plothover', plot_tooltip);
+	$('#sad_plot_3').bind('plothover', plot_tooltip);
 
 	// DR init
 	dr_fun.v[0] = parseInt($('#dr_a').val());
 	dr_fun.v[1] = parseInt($('#dr_d').val());
 	update_value(dr_fun, dr_graph.n.n); // d
 	dr_update_plots();
+	$('#dr_plot_1').bind('plothover', plot_tooltip);
+	$('#dr_plot_2').bind('plothover', plot_tooltip);
+	$('#dr_plot_3').bind('plothover', plot_tooltip);
 
 	// SC init
 	sc_fun.v[0] = parseInt($('#sc_deml').val());
@@ -552,6 +598,9 @@ function initialize() {
 	sc_fun.v[2] = parseInt($('#sc_sces').val());
 	update_value(sc_fun, sc_graph.n.n); // deml
 	sc_update_plots();
+	$('#sc_plot_1').bind('plothover', plot_tooltip);
+	$('#sc_plot_2').bind('plothover', plot_tooltip);
+	$('#sc_plot_3').bind('plothover', plot_tooltip);
 }
 
 function run_tests(){
